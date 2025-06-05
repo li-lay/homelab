@@ -1,0 +1,14 @@
+---
+- name: Update and upgrade all servers
+  hosts: nodes
+  become: yes
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Upgrade all packages
+      ansible.builtin.apt:
+        upgrade: yes
+        autoclean: yes
+        autoremove: yes

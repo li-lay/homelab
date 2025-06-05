@@ -1,0 +1,75 @@
+---
+- name: Install Tailscale
+  hosts: nodes
+  become: yes
+
+  vars:
+    tailscale_os_family: "{{ ansible_os_family | lower }}"
+    tailscale_architecture: "{{ ansible_architecture }}"
+
+  tasks:
+    - name: Ensure apt-transport-https and dirmngr are installed (for Debian/Ubuntu)
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - dirmngr
+        state: present
+      when: tailscale_os_family == 'debian'
+
+    - name: Add Tailscale GPG key (for Debian/Ubuntu)
+      ansible.builtin.apt_key:
+        url: https://pkgs.tailscale.com/stable/{{ tailscale_os_family }}/{{ ansible_distribution_codename }}.gpg
+        state: present
+      when: tailscale_os_family == 'debian'
+
+    - name: Add Tailscale APT repository (for Debian/Ubuntu)
+      ansible.builtin.apt_repository:
+        repo: deb https://pkgs.tailscale.com/stable/{{ tailscale_os_family }} {{ ansible_distribution_codename }} main
+        state: present
+        filename: tailscale
+      when: tailscale_os_family == 'debian'
+      notify: Update apt cache
+
+    - name: Install Tailscale (for Debian/Ubuntu)
+      ansible.builtin.apt:
+        name: tailscale
+        state: present
+        update_cache: yes
+      when: tailscale_os_family == 'debian'
+
+    - name: Add Tailscale repository (for RHEL/CentOS/Fedora)
+      ansible.builtin.yum_repository:
+        name: tailscale
+        description: Tailscale stable repository
+        baseurl: https://pkgs.tailscale.com/stable/{{ tailscale_os_family }}/{{ ansible_distribution_major_version }}/{{ tailscale_architecture }}
+        gpgcheck: yes
+        gpgkey: https://pkgs.tailscale.com/stable/{{ tailscale_os_family }}/{{ ansible_distribution_major_version }}/tailscale-{{ tailscale_os_family }}-{{ ansible_distribution_major_version }}.asc
+        enabled: yes
+      when: tailscale_os_family == 'redhat' or tailscale_os_family == 'fedora'
+
+    - name: Install Tailscale (for RHEL/CentOS/Fedora)
+      ansible.builtin.yum:
+        name: tailscale
+        state: present
+      when: tailscale_os_family == 'redhat' or tailscale_os_family == 'fedora'
+
+    - name: Start and enable Tailscale service
+      ansible.builtin.systemd:
+        name: tailscaled
+        state: started
+        enabled: yes
+
+    - name: Get Tailscale IP address (optional - for verification)
+      ansible.builtin.command: tailscale ip -4
+      register: tailscale_ip_output
+      changed_when: false # This command doesn't change system state
+
+    - name: Display Tailscale IP address (optional)
+      ansible.builtin.debug:
+        msg: "Tailscale IP address: {{ tailscale_ip_output.stdout }}"
+
+  handlers:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+      when: tailscale_os_family == 'debian'
