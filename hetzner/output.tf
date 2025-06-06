@@ -8,7 +8,7 @@ output "default_username" {
    value = var.default_username
 }
 
-output "user_password" {
+output "hashed_password" {
    description = "Default user password for cloud-init"
-   value = var.user_password
+   value = var.hashed_password
 }

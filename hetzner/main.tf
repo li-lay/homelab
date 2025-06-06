@@ -3,6 +3,17 @@
 #=========================================================#
 
 terraform {
+  encryption {
+    key_provider "pbkdf2" "mykey" {
+      passphrase = var.passphrase
+    }
+    method "aes_gcm" "mymethod" {
+      keys = key_provider.pbkdf2.mykey
+    }
+    state {
+      method = method.aes_gcm.mymethod
+    }
+  }
   required_providers {
     hcloud = {
       source  = "hetznercloud/hcloud"
@@ -33,7 +44,12 @@ locals {
         sudo: ALL=(ALL) ALL
         groups: users,sudo,docker # Add docker group if you plan to install docker
         shell: /bin/bash
-        passwd: ${var.user_password}
+
+    # Change passwords for user using chpasswd
+    chpasswd:
+      expire: false
+      users:
+      - {name: ${var.default_username}, password: ${var.hashed_password}}
     
     disable_root: true # Disable root login
     ssh_pwauth: false # Disable SSH password authentication
@@ -46,7 +62,7 @@ locals {
 # Create Cloud Server
 resource "hcloud_server" "node-1" {
   name        = "node-1"
-  image       = "fedora-41"
+  image       = "debian-12"
   server_type = "ccx13"
   location    = "fsn1"
   ssh_keys    = [hcloud_ssh_key.default.id]

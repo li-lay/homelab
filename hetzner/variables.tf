@@ -1,3 +1,9 @@
+variable "passphrase" { 
+  description = "Passphrase use to encrypt state files"
+  type = string
+  sensitive = true
+}
+
 variable "hcloud_token" {
   description = "Hetzner Cloud API token"
   type        = string
@@ -22,8 +28,8 @@ variable "default_username" {
   sensitive   = false
 }
 
-variable "user_password" {
-  description = "Set user password for all nodes"
+variable "hashed_password" {
+  description = "Set user password for all nodes, [only support hashed password]"
   type        = string
   sensitive   = false
 }

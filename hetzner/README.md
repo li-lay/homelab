@@ -5,3 +5,15 @@ Upon `tofu plan || tofu apply` it will prompt for hcloud_token, default_username
 
 default_username value will be use for user creation in cloud-init, meaning all server will have the same user.
 user_password value will be use to set the password of default_username in all server.
+
+## Requirements
+
+> [!IMPORTANT]
+> Create a variable value file `terraform.tfvars`
+
+```
+hcloud_token = ""
+default_username = ""
+hashed_password = ""
+passphrase = ""
+```
