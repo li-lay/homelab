@@ -1,0 +1,66 @@
+---
+- name: Install Docker on Debian
+  hosts: docker_nodes
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install prerequisite packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg
+
+    - name: Add Docker GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker APT repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+        state: present
+        filename: docker
+
+    - name: Install Docker Engine, CLI, and Containerd
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is running and enabled
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add current user to docker group (if specified)
+      user:
+        name: "{{ ansible_user }}" # This refers to the user connecting via SSH
+        groups: docker
+        append: yes
+      when: ansible_user is defined and ansible_user != "root"
+      # This task needs to be carefully considered.
+      # If you're running the playbook as root, or if the user is already root,
+      # adding to the docker group is unnecessary and might fail.
+      # If you want to add a *specific* user (e.g., 'your_username_here'),
+      # you should define a variable for it and use that instead of ansible_user.
+
+    - name: Display Docker version
+      command: docker version
+      register: docker_version_output
+      changed_when: false # This command doesn't change anything
+
+    - name: Print Docker version
+      debug:
+        msg: "{{ docker_version_output.stdout }}"

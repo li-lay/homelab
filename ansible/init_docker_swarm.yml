@@ -1,0 +1,32 @@
+---
+- name: Initialize Docker Swarm on the first host
+  hosts: docker_nodes
+  become: yes
+  run_once: true
+
+  vars:
+    docker_swarm_advertise_addr: "{{ ansible_host | default(ansible_default_ipv4.address) }}"
+
+  tasks:
+    - name: Ensure Docker service is running
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Install Docker SDK for Python via apt
+      apt:
+        name: python3-docker
+        state: present
+        update_cache: yes
+
+    - name: Initialize Docker Swarm
+      community.docker.docker_swarm:
+        state: present
+        advertise_addr: "{{ docker_swarm_advertise_addr }}"
+      register: swarm_init_result
+
+    - name: Display Swarm initialization status
+      debug:
+        msg: "Swarm initialized successfully."
+      when: swarm_init_result.changed
