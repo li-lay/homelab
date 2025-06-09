@@ -10,3 +10,9 @@ My Homelab project focused on automating the deployment and management of infras
 - **Ansible**: An automation tool for configuration management and application deployment.
 - **hcloud**: The command-line tool for managing resources on Hetzner Cloud.
 - **Docker Swarm**: The orchestration tool used for managing the containers running on the servers.
+
+## Notes
+- To generate traefik basic auth correctly in linux
+```
+echo $(htpasswd -nB username) | sed -e 's/\$/\$\$/g'
+```
