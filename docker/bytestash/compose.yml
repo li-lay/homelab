@@ -1,0 +1,47 @@
+---
+services:
+  bytestash:
+    image: "ghcr.io/jordan-dalby/bytestash:latest"
+    volumes:
+      - bytestash-data:/data/snippets
+    networks:
+      - proxy
+    secrets:
+      - bytestash_jwt_token
+    environment:
+      # See https://github.com/jordan-dalby/ByteStash/wiki/FAQ#environment-variables
+      BASE_PATH: ""
+      JWT_SECRET: /run/secrets/bytestash_jwt_token
+      TOKEN_EXPIRY: 24h
+      ALLOW_NEW_ACCOUNTS: "false"
+      DEBUG: "true"
+      DISABLE_ACCOUNTS: "false"
+      DISABLE_INTERNAL_ACCOUNTS: "false"
+
+      # See https://github.com/jordan-dalby/ByteStash/wiki/Single-Sign%E2%80%90on-Setup for more info
+      OIDC_ENABLED: "false"
+      OIDC_DISPLAY_NAME: ""
+      OIDC_ISSUER_URL: ""
+      OIDC_CLIENT_ID: ""
+      OIDC_CLIENT_SECRET: ""
+      OIDC_SCOPES: ""
+
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.bytestash.rule=Host(`paste.lilay.dev`)
+        - traefik.http.routers.bytestash.entrypoints=https
+        - traefik.http.services.bytestash.loadbalancer.server.port=5000
+        - traefik.http.routers.bytestash.service=bytestash
+        - traefik.http.routers.bytestash.tls.certresolver=cloudflare
+
+volumes:
+  bytestash-data: {}
+
+networks:
+  proxy:
+    external: true
+
+secrets:
+  bytestash_jwt_token:
+    external: true
