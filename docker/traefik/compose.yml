@@ -15,6 +15,15 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     secrets:
       - cf_token
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: any
+      labels:
+        - "traefik.swarm.lbswarm=true"
 
 networks:
   proxy:
