@@ -1,7 +1,7 @@
 version: "3"
 services:
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ee:lts
     volumes:
       - data:/data
       - /var/run/docker.sock:/var/run/docker.sock
