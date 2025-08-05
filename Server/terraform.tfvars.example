@@ -1,0 +1,4 @@
+hcloud_token = "hcloud_token_here"
+default_username = "default_username"
+hashed_password = "hashed_password"
+passphrase = "encryption_passphrase"
