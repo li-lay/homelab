@@ -1,0 +1,12 @@
+# Default port 80
+services:
+  excalidraw:
+    image: excalidraw/excalidraw:latest
+    container_name: excalidraw
+    stdin_open: true
+    tty: true
+    networks:
+      - proxy
+networks:
+  proxy:
+    external: true

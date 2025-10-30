@@ -1,0 +1,15 @@
+# Container updater
+services:
+    tugtainer:
+        container_name: tugtainer
+        restart: unless-stopped
+        ports:
+            - 9412:80
+        volumes:
+            - tugtainer_data:/tugtainer
+            - /var/run/docker.sock:/var/run/docker.sock
+        image: quenary/tugtainer:latest
+volumes:
+    tugtainer_data:
+        external: true
+        name: tugtainer_data
