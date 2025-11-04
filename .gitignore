@@ -3,3 +3,4 @@ TLSs
 *.csr
 *.pem
 .env
+n8n-local-files
