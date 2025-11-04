@@ -1,0 +1,76 @@
+{
+  "ignition": {
+    "version": "3.5.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "groups": [
+          "wheel",
+          "sudo",
+          "docker"
+        ],
+        "name": "lilay",
+        "passwordHash": "$y$j9T$cZJ8Zf6r6Y5M.iLtV5ErG.$9fX8.BRq9kxc01fpIEQTG2/BuZpSHW33lbApijRtTaC",
+        "sshAuthorizedKeys": [
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDHoN1mdEM968LDT67u6by+mArkA/DGN6ZPZrXdw7L3f4FQT+1DIZi7A5/RVsfyrzde+t9g94aPZzppiL6JJg0SgGqoF3YKVJBC9yRbHY4JJTP0JYpoKdwx6CRlOVShyPwh3nALjYbbeJlPirDZbMHN2S4ZMGHliAWpwf+xS/kSbNHCnWg7cpxp04q0bMj5t6FZyeX26twy7j1jGn/8LqXyDifwhYoZLWufsks/ViwTayXTpd1/AYF7ztxuaEgX72EBJ5Fk6IS8IXZHHjTI99Jm6/PVV5HEBY+QV+mtejpPGiT6CkxuS9qz7SUWicDLUnWFxBNRGXDc0uGhZTWhRCcPJhWNWtDpp4mur9MSAa32ehWNucCyreAUN6Ac73NdwMZqyOZIilgA/m8qNfX/3ckHTadc4BE/w1Se3WBSEyglYTKoFZIyPoVFE5POB9Cow33oP23rITc7VddxssfEM6VfwJEfKnMiRIzcALi5bnWoEf+EY2YYvaOrdEff3OnbH0RrZA+iT0Qa2k4E0okaMx/GUumPwJspIt5lAufz099U4zt0j33dAiLDi//uGY6qVgzlDPifANI4eB1U9olZh1g9H+n9vmxvv1uoomSjjHCIyvj+eIUsrSxxpr2cAUBTy6dEVu62//rfJ5pH2YKjOUPr4TTpojjv4gCYDEYDZ23PJw== contact@lilay.dev"
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "files": [
+      {
+        "path": "/etc/hostname",
+        "contents": {
+          "compression": "",
+          "source": "data:,homelab"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/zincati/config.d/90-disable-auto-updates.toml",
+        "contents": {
+          "compression": "",
+          "source": "data:,%5Bupdates%5D%0Aenabled%20%3D%20false%0A"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/systemd/system/rpm-ostree-countme.timer.d/40-weekly.conf",
+        "contents": {
+          "compression": "",
+          "source": "data:,%5BTimer%5D%0AOnCalendar%3Dweekly%0A"
+        },
+        "mode": 420
+      },
+      {
+        "path": "/etc/modules-load.d/zfs.conf",
+        "contents": {
+          "compression": "",
+          "source": "data:,zfs"
+        },
+        "mode": 420
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "contents": "[Unit]\nDescription=Rebase to uCore\nWants=network-online.target\nAfter=network-online.target\nBefore=zincati.service\nConditionPathExists=!/var/lib/rpm-ostree-rebase-to-ucore.stamp\n\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/usr/bin/rpm-ostree rebase --reboot ostree-unverified-registry:ghcr.io/ublue-os/ucore-minimal:stable-nvidia\nExecStart=/usr/bin/touch /var/lib/rpm-ostree-rebase-to-ucore.stamp\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "rpm-ostree-rebase-to-ucore.service"
+      },
+      {
+        "contents": "[Unit]\nDescription=Docker Socket for the API\nPartOf=docker.service\n\n[Socket]\nListenStream=/var/run/docker.sock\nSocketMode=0660\nSocketUser=root\nSocketGroup=docker\n\n[Install]\nWantedBy=sockets.target\n",
+        "enabled": true,
+        "name": "docker.socket"
+      },
+      {
+        "contents": "[Unit]\nDescription=Load ZFS kernel module\nDefaultDependencies=false\nAfter=systemd-modules-load.service\nBefore=zfs-mount.service\n\n[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=/usr/sbin/modprobe zfs\n\n[Install]\nWantedBy=sysinit.target\n",
+        "enabled": true,
+        "name": "zfs-load.service"
+      }
+    ]
+  }
+}
