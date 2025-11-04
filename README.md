@@ -2,6 +2,10 @@
 
 This repository contains the configurations/manifests for my personal homelab setup.
 
+## OS
+
+**uCore:** An container-focused and immutable operating system based on Fedora CoreOS.
+
 ## Services
 
 ### IoT
@@ -17,4 +21,8 @@ This repository contains the configurations/manifests for my personal homelab se
 ### Observability
 
 - **Netdata:** Real-time performance monitoring.
+
+### Management
+
+- **Portainer:** A container management UI.
 - **Tugtainer:** A container updater.
