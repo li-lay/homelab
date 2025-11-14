@@ -1,0 +1,18 @@
+name: tts
+services:
+    kokoro-fastapi-gpu:
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          count: all
+                          capabilities:
+                              - gpu
+        ports:
+            - 8880:8880
+        image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+        runtime: nvidia
+        container_name: tts
+        security_opt:
+          - "label=disable"
