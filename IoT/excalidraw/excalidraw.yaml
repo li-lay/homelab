@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: excalidraw-deployment
+  labels:
+    type: IoT
+    pod: excalidraw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: excalidraw
+  template:
+    metadata:
+      labels:
+        pod: excalidraw
+    spec:
+      containers:
+        - image: excalidraw/excalidraw:latest
+          name: excalidraw
+          stdin: true
+          tty: true
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: excalidraw-service
+  labels:
+    type: IoT
+    pod: excalidraw
+spec:
+  type: ClusterIP
+  selector:
+    pod: excalidraw
+  ports:
+    - port: 80
+      targetPort: 80
