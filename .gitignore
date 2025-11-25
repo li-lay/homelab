@@ -4,3 +4,4 @@ TLSs
 *.pem
 .env
 n8n-local-files
+cloudflared-tunnel-token.yaml

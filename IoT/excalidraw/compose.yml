@@ -3,7 +3,7 @@ services:
   excalidraw:
     image: excalidraw/excalidraw:latest
     container_name: excalidraw
-    restart: unless-stopped
+    restart: always
     stdin_open: true
     tty: true
     networks:
