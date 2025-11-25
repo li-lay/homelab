@@ -3,8 +3,11 @@ kind: Deployment
 metadata:
   name: cloudflared-deployment
   namespace: default
+  labels:
+    type: Networking
+    pod: cloudflared
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       pod: cloudflared
