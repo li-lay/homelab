@@ -15,12 +15,13 @@ spec:
       labels:
         pod: kokoro-fastapi
     spec:
+      runtimeClassName: nvidia
       containers:
         - image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
           resources:
             limits:
               nvidia.com/gpu: 1
-          name: tts
+          name: kokoro-fastapi
           ports:
             - containerPort: 8880
               protocol: TCP
