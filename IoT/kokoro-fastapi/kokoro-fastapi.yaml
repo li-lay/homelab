@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    type: IoT
+    pod: kokoro-fastapi
+  name: kokoro-fastapi-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: kokoro-fastapi
+  template:
+    metadata:
+      labels:
+        pod: kokoro-fastapi
+    spec:
+      containers:
+        - image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          name: tts
+          ports:
+            - containerPort: 8880
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    type: IoT
+    pod: kokoro-fastapi
+  name: kokoro-fastapi-service
+spec:
+  type: ClusterIP
+  ports:
+    - name: "8880"
+      port: 8880
+      targetPort: 8880
+  selector:
+    pod: kokoro-fastapi
